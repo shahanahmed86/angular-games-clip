@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { FirebaseError } from '@angular/fire/app';
 import { FormGroup, FormControl, Validator, Validators } from '@angular/forms';
+import IUser from 'src/app/models/user.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
 	selector: 'app-register',
@@ -7,9 +10,16 @@ import { FormGroup, FormControl, Validator, Validators } from '@angular/forms';
 	styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+	inSubmission = false;
+	constructor(private auth: AuthService) {}
+
 	name = new FormControl('', [Validators.required, Validators.minLength(3)]);
 	email = new FormControl('', [Validators.required, Validators.email]);
-	age = new FormControl('', [Validators.required, Validators.min(18), Validators.max(120)]);
+	age = new FormControl<number | null>(null, [
+		Validators.required,
+		Validators.min(18),
+		Validators.max(120)
+	]);
 	password = new FormControl('', [
 		Validators.required,
 		Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
@@ -30,13 +40,33 @@ export class RegisterComponent {
 		phone: this.phone
 	});
 
-	register() {
-		this.showAlert = true;
-		this.alertMessage = 'Please wait, your account is being created';
-		this.alertColor = 'blue';
+	async register() {
+		try {
+			this.showAlert = true;
+			this.alertMessage = 'Please wait, your account is being created';
+			this.alertColor = 'blue';
+			this.inSubmission = true;
+
+			await this.auth.createUser(this.registerForm.value as IUser);
+		} catch (error: FirebaseError | unknown) {
+			console.log({ error });
+
+			if (error instanceof FirebaseError && error.code.startsWith('auth/')) {
+				this.alertMessage = error.message;
+			} else {
+				this.alertMessage = 'An unexpected error occurred, please try again later';
+			}
+
+			this.alertColor = 'red';
+			this.inSubmission = false;
+
+			return;
+		}
+		this.alertMessage = 'Success, your account has been created';
+		this.alertColor = 'green';
 	}
 
 	showAlert = false;
 	alertMessage = 'Please wait, your account is being created';
-	alertColor = 'blue'
+	alertColor = 'blue';
 }
