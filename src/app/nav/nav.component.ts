@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalService } from '../services/modal.service';
 import { AuthService } from '../services/auth.service';
+import { ModalService } from '../services/modal.service';
 
 @Component({
 	selector: 'app-nav',
@@ -8,10 +8,12 @@ import { AuthService } from '../services/auth.service';
 	styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
-	constructor(public modal: ModalService, public auth: AuthService) {
-	}
+	constructor(
+		public modal: ModalService,
+		public auth: AuthService,
+	) {}
 
-	ngOnInit(): void {}
+	ngOnInit() {}
 
 	openModal(ev: Event) {
 		ev.preventDefault();

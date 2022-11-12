@@ -34,6 +34,8 @@ export class LoginComponent implements OnInit {
 			console.log(error);
 
 			return;
+		} finally {
+			
 		}
 
 		this.alertMessage = 'Success!, You are now logged in.';
