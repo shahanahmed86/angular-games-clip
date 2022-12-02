@@ -74,4 +74,14 @@ export class ManageComponent implements OnInit {
 			if (element.docId === clip.docId) this.clips.splice(i, 1);
 		});
 	}
+
+	async copyToClipboard(ev: MouseEvent, docId: String | undefined) {
+		ev.preventDefault();
+		if (!docId) return;
+
+		const url = `${location.origin}/clip/${docId}`;
+		await navigator.clipboard.writeText(url);
+
+		alert('Link copied');
+	}
 }
